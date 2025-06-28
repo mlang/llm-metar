@@ -1,0 +1,11 @@
+[project]
+name = "llm-metar"
+version = "0.1"
+description = "A dialog Toolbox for LLM"
+readme = "README.md"
+license = "Apache-2.0"
+authors = [{ name = "Mario Lang", email = "mlang@blind.guru" }]
+dependencies = [ "llm>=0.26", "httpx" ]
+
+[project.entry-points.llm]
+llm_metar = "llm_metar"
