@@ -1,0 +1,11 @@
+[project]
+name = "llm-sky"
+version = "0.1"
+description = "LLM tools to query information about local weather"
+readme = "README.md"
+license = "Apache-2.0"
+authors = [{ name = "Mario Lang", email = "mlang@blind.guru" }]
+dependencies = [ "llm>=0.26", "httpx", "pydantic-extra-types", "ephem", "geopy" ]
+
+[project.entry-points.llm]
+llm_sky = "llm_sky"
