@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from datetime import datetime, timezone
 import math
 
@@ -71,18 +70,6 @@ class METAR(llm.Toolbox):
         """Retrieve a METAR weather report for a predefined station."""
 
         return metar(self._code)
-
-
-def dms_to_decimal(dms: str) -> float:
-    """Convert degree-minutes-seconds format to decimal degrees."""
-    direction = dms[-1]
-    numbers = list(map(int, dms[:-1].split('-')))
-    while len(numbers) < 3: numbers.append(0)
-    degrees, minutes, seconds = numbers
-    decimal = degrees + minutes / 60 + seconds / 3600
-    if direction in 'SW': decimal = -decimal
-
-    return decimal
 
 
 def haversine(lat1, lon1, lat2, lon2):
