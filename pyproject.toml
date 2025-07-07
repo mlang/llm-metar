@@ -1,7 +1,7 @@
 [project]
 name = "llm-sky"
 version = "0.1"
-description = "A dialog Toolbox for LLM"
+description = "LLM tools to query information about local weather"
 readme = "README.md"
 license = "Apache-2.0"
 authors = [{ name = "Mario Lang", email = "mlang@blind.guru" }]

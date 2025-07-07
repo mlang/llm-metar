@@ -82,8 +82,9 @@ def moon(latitude: Latitude, longitude: Longitude) -> str:
 
 def metar_fragment(code: str) -> llm.Fragment:
     """Fetch a METAR weather report."""
-
-    return llm.Fragment(metar(code), source=URL.format(code=code.upper()))
+    time, report = metar(code)
+    delta = time - datetime.now(timezone.utc)
+    return llm.Fragment(f'{code.upper()} {round(-delta.total_seconds() / 60)}m ago: {report}', source=URL.format(code=code.upper()))
 
 
 def metar(code: str) -> str:
@@ -95,8 +96,7 @@ def metar(code: str) -> str:
 
         time, report = response.text.split("\n")[0:2]
         time = datetime.strptime(time, "%Y/%m/%d %H:%M").replace(tzinfo=timezone.utc)
-        delta = time - datetime.now(timezone.utc)
-        return delta, " ".join(report.split(" ")[2:])
+        return time, " ".join(report.split(" ")[2:])
 
 
 def haversine(lat1, lon1, lat2, lon2):
@@ -127,7 +127,8 @@ def metar_nearby(latitude: Latitude, longitude: Longitude, max_distance: float =
     for code, station, distance in distances:
         try:
             compass = bearing_to_compass(bearing(latitude, longitude, station.coordinate.latitude, station.coordinate.longitude))
-            delta, report = metar(code)
+            time, report = metar(code)
+            delta = time - datetime.now(timezone.utc)
             if delta.total_seconds() >= -max_seconds_ago:
                 result[f'{station.name}: {round(distance)}km {compass} {round(abs(delta).total_seconds() / 60)}m ago'] = report
         except:
