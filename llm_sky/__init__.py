@@ -6,7 +6,7 @@ import httpx
 import llm
 from pydantic_extra_types.coordinate import Coordinate, Latitude, Longitude
 
-from llm_metar.metar_data import STATIONS
+from llm_sky.metar_data import STATIONS
 
 
 @llm.hookimpl
@@ -20,6 +20,30 @@ def register_tools(register):
     register(metar_nearby)
     register(METAR)
     register(moon)
+    register(Local)
+
+
+
+
+class Local(llm.Toolbox):
+    latitude: Latitude
+    longitude: Longitude
+
+    def __init__(self, latitude, longitude):
+        self.latitude = latitude
+        self.longitude = longitude
+
+
+    def moon(self):
+        """Moon status."""
+
+        return moon(self.latitude, self.longitude)
+
+
+    def metar(self, radius_km: int = 100):
+        """METAR weather reports around the current location."""
+
+        return metar_nearby(self.latitude, self.longitude, radius_km)
 
 
 
