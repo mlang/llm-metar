@@ -107,15 +107,15 @@ def metar_fragment(code: str) -> llm.Fragment:
     return llm.Fragment(f'{code.upper()} {round(-delta.total_seconds() / 60)}m ago: {report}', source=URL.format(code=code.upper()))
 
 
-def metar(code: str) -> str:
+def metar(code: str) -> tuple[datetime, str]:
     """Fetch a METAR weather report."""
 
     with httpx.Client() as client:
         response = client.get(URL.format(code=code.upper()))
         response.raise_for_status()
 
-        time, report = response.text.split("\n")[0:2]
-        time = datetime.strptime(time, "%Y/%m/%d %H:%M").replace(tzinfo=timezone.utc)
+        time_str, report = response.text.split("\n")[0:2]
+        time = datetime.strptime(time_str, "%Y/%m/%d %H:%M").replace(tzinfo=timezone.utc)
         return time, " ".join(report.split(" ")[2:])
 
 
