@@ -2,8 +2,10 @@ from datetime import datetime, timezone
 import math
 
 import ephem
+from geopy.geocoders import Nominatim
 import httpx
 import llm
+from pydantic import BaseModel
 from pydantic_extra_types.coordinate import Coordinate, Latitude, Longitude
 
 from llm_sky.metar_data import STATIONS
@@ -29,9 +31,23 @@ class Local(llm.Toolbox):
     latitude: Latitude
     longitude: Longitude
 
-    def __init__(self, latitude, longitude):
-        self.latitude = latitude
-        self.longitude = longitude
+    def __init__(self, query = None, latitude = None, longitude = None):
+        if query:
+            result = Nominatim(user_agent="llm-sky").geocode(query)
+            self.latitude = result.latitude
+            self.longitude = result.longitude
+        elif latitude is not None and longitude is not None:
+            self.latitude = latitude
+            self.longitude = longitude
+        else:
+            self.latitude = float(input("Latitue: " ))
+            self.longitude = float(input("Longitude: "))
+
+
+    def location(self):
+        """The coordinates the user is located at."""
+
+        return Coordinate(self.latitude, self.longitude)
 
 
     def moon(self):

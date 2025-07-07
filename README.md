@@ -11,6 +11,7 @@ llm install git+https://github.com/mlang/llm-sky
 ## Usage
 
 ```bash
-llm -f sky:LOWG 'How is the weather?'
-llm -T sky 'How is the weather near LA Airport?'
+llm -f metar:LOWG 'How is the weather?'
+llm -T 'Local("Graz")' 'Report local conditions?'
+llm -T 'Local(latitude=47, longitude=15.5)' 'Report local conditions?'
 ```
