@@ -11,6 +11,21 @@ from pydantic_extra_types.coordinate import Coordinate, Latitude, Longitude
 from llm_sky.metar_data import STATIONS
 
 
+def owm_key():
+    return llm.get_key(None, 'openweathermap', 'OPENWEATHERMAP_API_KEY')
+
+
+def weather(latitude, longitude, units: str = 'metric'):
+    params = dict(
+        lat=latitude, lon=longitude, units=units,
+        appid=owm_key()
+    )
+    with httpx.Client() as http:
+        return http.get("https://api.openweathermap.org/data/2.5/weather",
+            params=params
+        ).json()
+
+    
 @llm.hookimpl
 def register_fragment_loaders(register):
     register('metar', metar_fragment)
@@ -21,6 +36,7 @@ def register_tools(register):
     register(metar)
     register(metar_nearby)
     register(moon)
+    if owm_key(): register(weather)
     register(Local)
 
 
@@ -58,6 +74,10 @@ class Local(llm.Toolbox):
 
         return metar_nearby(self.latitude, self.longitude, radius_km)
 
+    def weather(self, units: str = 'metric'):
+        """Query OpenWeatherMap."""
+
+        return weather(self.latitude, self.longitude, units)
 
 
 URL = 'https://tgftp.nws.noaa.gov/data/observations/metar/stations/{code}.TXT'
