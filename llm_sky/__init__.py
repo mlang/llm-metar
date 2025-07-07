@@ -53,7 +53,7 @@ class Local(llm.Toolbox):
         elif latitude is not None and longitude is not None:
             self.latitude, self.longitude = latitude, longitude
         else:
-            self.latitude = float(input("Latitue: " ))
+            self.latitude = float(input("Latitude: "))
             self.longitude = float(input("Longitude: "))
 
 

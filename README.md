@@ -1,6 +1,6 @@
 # llm-sky
 
-LLM tools for fetching information about the environment.
+LLM tools for fetching environmental information.
 
 ## Installation
 
