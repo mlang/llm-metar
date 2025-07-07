@@ -20,11 +20,8 @@ def register_fragment_loaders(register):
 def register_tools(register):
     register(metar)
     register(metar_nearby)
-    register(METAR)
     register(moon)
     register(Local)
-
-
 
 
 class Local(llm.Toolbox):
@@ -34,17 +31,17 @@ class Local(llm.Toolbox):
     def __init__(self, query = None, latitude = None, longitude = None):
         if query:
             result = Nominatim(user_agent="llm-sky").geocode(query)
-            self.latitude = result.latitude
-            self.longitude = result.longitude
+            if result is None:
+                raise RuntimeError(f"'{query}' not found")
+            self.latitude, self.longitude = result.latitude, result.longitude
         elif latitude is not None and longitude is not None:
-            self.latitude = latitude
-            self.longitude = longitude
+            self.latitude, self.longitude = latitude, longitude
         else:
             self.latitude = float(input("Latitue: " ))
             self.longitude = float(input("Longitude: "))
 
 
-    def location(self):
+    def coordinates(self) -> Coordinate:
         """The coordinates the user is located at."""
 
         return Coordinate(self.latitude, self.longitude)
@@ -100,16 +97,6 @@ def metar(code: str) -> str:
         time = datetime.strptime(time, "%Y/%m/%d %H:%M").replace(tzinfo=timezone.utc)
         delta = time - datetime.now(timezone.utc)
         return delta, " ".join(report.split(" ")[2:])
-
-
-class METAR(llm.Toolbox):
-    def __init__(self, code):
-        self._code = code
-
-    def get(self):
-        """Retrieve a METAR weather report for a predefined station."""
-
-        return metar(self._code)
 
 
 def haversine(lat1, lon1, lat2, lon2):
