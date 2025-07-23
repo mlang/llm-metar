@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from functools import lru_cache
 import math
 
 import ephem
@@ -10,6 +11,10 @@ from pydantic_extra_types.coordinate import Coordinate, Latitude, Longitude
 
 from llm_sky.metar_data import STATIONS
 
+
+@lru_cache()
+def nominatim(query: str):
+    return Nominatim(user_agent="llm-sky").geocode(query)
 
 def owm_key():
     return llm.get_key(None, 'openweathermap', 'OPENWEATHERMAP_API_KEY')
@@ -92,7 +97,7 @@ def register_tools(register):
 
 
 def geocode(query: str):
-    return Nominatim(user_agent=__package__).geocode(query).raw
+    return nominatim(query).raw
 
 
 class Local(llm.Toolbox):
@@ -101,7 +106,7 @@ class Local(llm.Toolbox):
 
     def __init__(self, query = None, latitude = None, longitude = None):
         if query:
-            result = Nominatim(user_agent="llm-sky").geocode(query)
+            result = nominatim(query)
             if result is None:
                 raise RuntimeError(f"'{query}' not found")
             self.latitude, self.longitude = result.latitude, result.longitude
