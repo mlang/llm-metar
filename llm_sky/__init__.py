@@ -153,10 +153,19 @@ def moon(latitude: Latitude, longitude: Longitude) -> str:
     moon = ephem.Moon(observer)
     illumination = moon.moon_phase * 100
     age = observer.date - ephem.previous_new_moon(observer.date)
-    status = "waxing" if age < SYNODIC_MONTH / 2 else "waning"
+    status = "Waxing" if age < SYNODIC_MONTH / 2 else "Waning"
     days_to_full = ephem.next_full_moon(observer.date) - observer.date
 
-    return f"{status} moon, illumination {round(illumination)}%, {round(days_to_full)} days to next full moon"
+    rising = observer.next_rising(moon)
+    setting = observer.next_setting(moon)
+
+    offset = datetime.now().astimezone().utcoffset()
+    if rising > setting:
+        next = ("moonset", setting.datetime() + offset)
+    else:
+        next = ("moonrise", rising.datetime() + offset)
+
+    return f"{status} moon, {round(illumination)}% illumination, {next[0]} at {next[1].time().isoformat(timespec='minutes')}, {round(days_to_full)} days until next full moon"
 
 
 def metar_fragment(code: str) -> llm.Fragment:
